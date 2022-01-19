@@ -14,12 +14,6 @@ man [command]
 # Get help with a target command (probably the same as above, but not always):
 [command] -h
 
-# In case you forget the name of a command, print possible commands relating to [guess]:
-apropos [guess]
-
-# View index of help pages:
-info
-
 *** Command Line Utilities:
 **** Basic File and Directory Operations:
 # Print current working directory:
@@ -33,6 +27,10 @@ ls -a
 
 # Recurse into subdirectories and list those as well:
 ls -r
+# or
+find ./
+# or
+tree
 
 # Move/rename a file or directory (be careful that you don't move the source over a destination with the same name):
 mv [source] [destination]
@@ -44,13 +42,10 @@ rm [target]
 cp [source] [destination]
 
 # Mount filesytem:
-mount /dev/[device name] /media/[device name]
+mount /dev/[device name] /path/to/folder
 
 # Unmount:
-umount /media/[device name]
-
-# Forensically clone filesystems and do other low-level operations on files. Very dangerous:
-dd
+umount /path/to/folder
 
 # Work with filesystems and partitions. (Easier, still quite dangerous):
 fdisk
@@ -66,20 +61,27 @@ sudo -s
 # Quit system administration:
 exit
 
+# Ubuntu / Debian
 # Check distro repositories for software updates:
 sudo apt-get update
+sudo apt update
 
 # Download and install updates (update first):
 sudo apt-get upgrade
+sudo apt upgrade
 
 # Search for package in the repositories:
 apt-cache search [keyword]
+# or
+apt search [keyword]
 
 # Get more detail on one specific package:
 apt-cache show [package name]
+apt show [package name]
 
 # Download and install a package:
 sudo apt-get install [package name]
+sudo apt install [package name]
 
 # View the output of a command in a more convenient format:
 [command] | less
@@ -90,7 +92,7 @@ sudo apt-get install [package name]
 cat [file]
 
 # Find files matching [filename]:
-locate [filename]
+? locate [filename]
 
 # Search through [filename] for matches to [phrase]:
 grep [phrase] [filename]
@@ -110,32 +112,29 @@ top
 htop
 
 # Stop a process from using all system resources and lagging computer:
+# change process priority, rarely used
 nice [process name]
 
 # Kill misbehaving process (use sparingly, last resort, try 'nice' command first):
-pkill [process name]
+kill $PID # or kill -15 $PID  # send SIGTERM signal to PID
+kill -9 # send SIGKILL signal to PID
+pkill [process name] # pattern kill
 
 **** Compression and Encryption:
 
 # Make a simple compressed backup of a file or directory:
-tar -cvzf [backup output.tgz] [target file or directory]
+# -c create , -v verbose, -z gzip compress, -f [] output file
+tar -cvzf output.tgz ./data/*
+# .tgz or .tar.gz
 
 # Open a compressed .tgz or .tar.gz file:
+# -x extract -v verbose -f file
 tar -xvf [target.tgz]
-
-# Encrypt a file:
-gpg -o [outputfilename.gpg] -c [target file]
-
-# Decrypt a file:
-gpg -o [outputfilename] -d [target.gpg]
-
-# Zip and encrypt a directory simultaneously:
-gpg-zip -o encrypted-filename.tgz.gpg -c -s file-to-be-encrypted
 
 *** The Bash shell:
 **** File Name expansions:
 # Current user's home directory:
-~/
+~/ # /home/username/
 
 # Current directory:
 ./
@@ -173,7 +172,9 @@ gpg-zip -o encrypted-filename.tgz.gpg -c -s file-to-be-encrypted
 [file/command] >> [file]
 
 # Works like |, but it writes output to both target and terminal:
-tee [target]
+cat xxx | tee [target] # sound like T
+# or open a new terminal window and
+tail -f file
 
 **** Controlling Execution:
 # Wait until [command 1] is finished to execute [command 2]
@@ -196,7 +197,7 @@ phrase*
 ?
 
 # Matches any of the characters listed inside brackets:
-[chars]
+[chars] # c or h or a or r or s
 
 # Matches a range of chars between a-z:
 [a-z]
@@ -206,19 +207,15 @@ phrase*
 **** Networking:
 
 # Configure network interfaces:
-ifconfig
-
-# Configure wireless network interfaces:
-iwconfig
+ifconfig # or ip addr 
 
 # Connect to a remote server.
-ssh [username]@[ipaddress]
-
-# Forward x from target to current machine (Get a remote desktop. Very obscure and very useful):
-ssh -x [username]@[ipaddress]
+# ssh: secure shell
+ssh user@192.168.1.1
 
 # Copy files over the network from one machine to another:
-scp [source filename]:[username]@[ipaddress] [target filename]:[target username]@[target ipaddress]
+# ssh copy
+scp ./data.zip user@192.168.1.1:/home/user/Download/data.zip
 
 # Copy only changes between files or directories (super efficient way to sync directories, works either locally or with remote servers using username@ipaddress:optionalport, just like ssh):
 rsync [source] [target]
@@ -231,39 +228,28 @@ traceroute6 [ip address]
 
 # Network Monitor
 netstat
-
-# Manage standard linux firewall (advanced users only)
-iptables
-
-# Scan this machine to check for open ports:
-nmap 127.0.0.1
-
-***** netcat:
-
-# Listen for input from network on [recieving port], dump it to a file (possibly insecure):
-netcat -l [recieving port] > file_copied
-
-# Pipe the output of a command to a target ip and port over the network:
-[command] | netcat -w [number of seconds before timeout] [target ip] [target port]
-
-# Use tar to compress and output a file as a stream, pipe it to a target ip and port over the network:
-sudo tar -czf - [filename] | netcat -w [number of seconds before timeout] [target ip] [target port]
+netstat -an # show port binding
+netstat -alpn # show port binding with process name
+netstat -rn # show route table
 
 **** Users and Groups:
 # Change owner of a file or directory:
-chown
+chown username:groupname filename
+chown username:groupname -R dirname
 
 # Change privileges over file or directory:
-chmod
+chmod a+x file
+chmod 755 file
+chmod 644 -R dirname
 
 # Create a new user:
-adduser
+useradd
 
 # Change user privileges (be very careful with this one):
 usermod
 
 # Delete user"
-deluser
+userdel
 
 # Print groups:
 groups
@@ -275,24 +261,15 @@ groupadd
 groupmod
 
 # Delete group:
-delgroup
+groupdel
 
 # Temporarily become a different user:
+# switch user
 su [username]
 
 
 # Print usernames of logged in users:
 users
-
-# Write one line to another user from your terminal:
-talk
-
-# Interactive talk program to talk to other users from terminal:
-ytalk
-
-**** Working With Files, Continued:
-# View what processes are using what files:
-lsof
 
 # View the differences between two files:
 diff [file 1] [file 2]
@@ -301,19 +278,8 @@ diff [file 1] [file 2]
 head -n [number of lines] [file]
 
 # Like head, but it outputs the last -n lines:
-tail
-
-# Checksum a file:
-md5sum [file]
-
-# Checksum every file in a directory:
-md5deep [directory]
-
-# Checksum a file (safer algorithm with no hash collisions):
-sha1sum
-
-# Same operation as md5deep, but using sha1:
-sha1deep
+tail -n number file
+tail -f file # follow, watch change
 
 # Call [command] every -n seconds, and display output:
 watch -n [number of seconds] [command]
@@ -343,66 +309,29 @@ lsb_release -a
 # Print linux kernel version:
 uname -a
 
-# Print information about kernel modules:
-lsmod
-
-# Configure kernel modules (never do this):
-modprobe
-
-# View Installed packages:
-dpkg --get-selections
-
-# Print environment variables:
-printenv 
-
-# List hardware connected via PCI ports:
-lspci
-
-# List hardware connected via USB ports:
-lsusb
-
-# Print hardware info stored in BIOS:
-sudo dmidecode
-
-# Dump captured data off of wireless card:
-dumpcap
-
-# Dump info about keyboard drivers:
-dumpkeys
-
-***** System Administration (Continued):
-
-# Add a Personal Package Archive from Ubuntu Launchpad:
-
-add-apt-repository
-
-# Install a .deb file from command line:
-sudo dpkg -i package.deb
 **** Python:
 
 # update pip (Python package manager):
-pip install -U pip
+pip install -U flask
 
 # search pip repos
-pip
+pip search django
 
 # create a virtual python environment
-virtualenv [dirname] --no-site-packages
+python -m venv [dirname]
 
 # connect to a virtual python environment
 source [dirname]/bin/activate
+. [dirname]/bin/activate
 
 # disconnect from a python environment:
 deactivate
 
-# install package into virtual python environment from outsie:
-pip install [packagename]==[version_number] -E [dirname]
-
 # export python virtual environment into a shareable format:
-pip freeze -E [dirname] > requirements.txt
+pip freeze > requirements.txt
 
 # import python virtual environment from a requirements.txt file:
-pip install -E [dirname] -r requirements.txt
+pip install -r requirements.txt
 
 **** git (all commands must be performed in the same directory as .git folder):
 
@@ -429,6 +358,7 @@ git push [target]
 
 # Create a new branch:
 git branch [branchname]
+git checkout -b [branchname]
 
 # Switch to target branch:
 git checkout [branchname]
@@ -437,33 +367,28 @@ git checkout [branchname]
 git branch -d [branchname]
 
 # Merge two branches:
-git merge [branchname] [branchname]
+git merge [other branch]
 
-*** Virtualization:
+*** mysql/postgresql:
 
-#clone a virtual machine (this works, it's been tested):
-vboxmanage clonehd [virtual machine name].vdi --format VDI ~/[target virtual machine name].vdi
-
-#mount a shared virtual folder:
-#you need to make sure you have the right kernel modules. You can do this with modprobe, but this package works instead in a ubuntu-specific way.
-
-sudo apt-get install virtualbox-ose-guest-utils
-
-sudo mount -t vboxsf [name of Shared folder specified in Virtualbox] [path of mountpoint]
-
-*** mysql:
+# cli:
+mysql
+psql
 
 # Get help:
 help
 
 # Show databases:
 show databases;
+\l 
 
 # Choose a database to use:
 use [database name here];
+\c dataname
 
 # Show database schema:
 show tables;
+\dt
 
 # Delete database:
 DROP DATABASE [databasename];
@@ -473,12 +398,15 @@ CREATE DATABASE [databasename];
 
 # Create a new user:
 CREATE USER [username@localhost] IDENTIFIED BY '[password]' ;
+CREATE USER username encrypted password 'password';
 
 # Show users:
 select * from mysql.user;
+\du
 
 # Delete a user:
 delete from mysql.user WHERE User='[user_name]';
+DROP USER username;
 
 # Give user access to all tables (make them root). the "%" means that they can sign in remotely, from any machine, not just localhost.:
 grant all privileges on *.* to someusr@"%" identified by '[password]';
@@ -489,25 +417,12 @@ grant select,insert,update,delete,create,drop on [somedb].* to [someusr]@["%"] i
 # Tell mysql to use new user priv policies:
 flush privileges;
 
-# change user password:
-use mysql;
-
-update user set password='[password]'('[newpassword]') where User='[user_name]' ;
-
 # mysql command line args:
 
 # export text file with commands to rebuild all mysql tables:
 
-mysqldump [databasename] > [dumpfilename.txt]
+mysqldump [databasename] > backup.sql
 
 # restore from a dump:
 
-mysql -u [username] -p < [dumpfilename.txt]
-
-# dump entire database:
-
-mysqldump -u [username] -p --opt [databasename] > [dumpfile.sql]
-
-# restore from entire database dump:
-
-mysql -u [username] -p --database=[databasename] < [dumpfile.sql]
+mysql -u [username] -p < backup.sql
